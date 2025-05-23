@@ -15,7 +15,8 @@ let db
 async function connectDB () {
   try {
     await client.connect()
-    db = client.db('admin')
+    // Use your app's database, not 'admin'
+    db = client.db(`${process.env.USER_NAME}`)
     await db.command({ ping: 1 })
     console.log(console.log('✅ MongoDB Connected'))
   } catch (err) {
@@ -24,7 +25,14 @@ async function connectDB () {
   }
 }
 
-module.exports = connectDB
+function getDb () {
+  if (!db) {
+    throw new Error('Database not initialized!')
+  }
+  return db
+}
+
+module.exports = { connectDB, getDb }
 
 /** 
   // const uri = `mongodb+srv://${process.env.USER_NAME}:${process.env.USER_PASS}@qprepaiapp.q5ntm0w.mongodb.net/?retryWrites=true&w=majority`
