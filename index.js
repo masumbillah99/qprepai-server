@@ -3,12 +3,16 @@ const app = express()
 const cors = require('cors')
 const path = require('path')
 require('dotenv').config()
-const { MongoClient, ServerApiVersion } = require('mongodb')
 const { connectDB } = require('./dtbase/db')
 const port = process.env.PORT || 5000
+const {
+  generateInterviewQuestions,
+  generateConceptExplanation
+} = require('./controllers/aiController')
 
 const authRoutes = require('./routes/auth')
 const sessionRoutes = require('./routes/sessionRoutes')
+const aiRoute = require('./routes/aiRoute')
 
 // middleware
 app.use(cors())
@@ -24,9 +28,11 @@ app.use('/api/auth', authRoutes)
 
 // sesstion routes
 app.use('/api/sessions', sessionRoutes)
+
 // questions routes
-// ai generate questions routes
-// ai generate explanation routes
+
+// ai generate interview questions and explanation routes
+app.use('/api/ai', aiRoute)
 
 /** routes end here */
 

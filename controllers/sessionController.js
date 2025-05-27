@@ -105,3 +105,38 @@ exports.getSessionById = async (req, res) => {
 
 // delete a session by id
 // @route - delete in api/sessions/:id
+exports.deleteSessionById = async (req, res) => {
+  try {
+    const db = getDb()
+    const sessionId = req.params.id
+    if (!sessionId) {
+      return res
+        .status(400)
+        .json({ success: false, message: 'Session id required' })
+    }
+    const { ObjectId } = require('mongodb')
+
+    // Delete the session
+    const sessionResult = await db
+      .collection('sessions')
+      .deleteOne({ _id: new ObjectId(sessionId) })
+
+    // Optionally, delete related questions
+    await db
+      .collection('questions')
+      .deleteMany({ session: new ObjectId(sessionId) })
+    if (sessionResult.deletedCount === 0) {
+      return res
+        .status(404)
+        .json({ success: false, message: 'Session not found' })
+    }
+    res.json({
+      success: true,
+      message: 'Session deleted successfully'
+    })
+  } catch (err) {
+    res
+      .status(500)
+      .json({ success: false, message: 'Server Error', error: err.message })
+  }
+}
