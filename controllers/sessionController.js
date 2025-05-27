@@ -20,7 +20,7 @@ exports.createSession = async (req, res) => {
 
     // Build sessionData with all props
     const sessionData = {
-      user: userId,
+      user: req?.body?.userId,
       role,
       experience,
       topicsToFocus,
@@ -72,6 +72,36 @@ exports.createSession = async (req, res) => {
 
 // get a session by id
 // @route - get in api/sessions/:id
+exports.getSessionById = async (req, res) => {
+  try {
+    const db = getDb()
+    const sessionId = req.params.id
+    if (!sessionId) {
+      return res
+        .status(400)
+        .json({ success: false, message: 'Session id required' })
+    }
+    const { ObjectId } = require('mongodb')
+    const session = await db
+      .collection('sessions')
+      .findOne({ _id: new ObjectId(sessionId) })
+    if (!session) {
+      return res
+        .status(404)
+        .json({ success: false, message: 'Session not found' })
+    }
+    // Optionally, fetch questions for this session
+    const questions = await db
+      .collection('questions')
+      .find({ session: new ObjectId(sessionId) })
+      .toArray()
+    res.json({ success: true, session, questions })
+  } catch (err) {
+    res
+      .status(500)
+      .json({ success: false, message: 'Server Error', error: err.message })
+  }
+}
 
 // delete a session by id
 // @route - delete in api/sessions/:id

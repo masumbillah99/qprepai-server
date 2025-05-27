@@ -1,5 +1,5 @@
 const express = require('express')
-const { createSession } = require('../controllers/sessionController')
+const { createSession, getSessionById } = require('../controllers/sessionController')
 
 const router = express.Router()
 
@@ -9,6 +9,7 @@ router.post('/create', createSession)
 // my session get
 
 // session get by id
+router.get('/:id', getSessionById)
 
 // session delete by id
 
