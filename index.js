@@ -5,13 +5,10 @@ const path = require('path')
 require('dotenv').config()
 const { connectDB } = require('./dtbase/db')
 const port = process.env.PORT || 5000
-const {
-  generateInterviewQuestions,
-  generateConceptExplanation
-} = require('./controllers/aiController')
 
 const authRoutes = require('./routes/auth')
 const sessionRoutes = require('./routes/sessionRoutes')
+const questionRoutes = require('./routes/questionRoutes')
 const aiRoute = require('./routes/aiRoute')
 
 // middleware
@@ -23,15 +20,9 @@ connectDB()
 
 /** routes start here */
 
-// auth routes
 app.use('/api/auth', authRoutes)
-
-// sesstion routes
 app.use('/api/sessions', sessionRoutes)
-
-// questions routes
-
-// ai generate interview questions and explanation routes
+app.use('/api/questions', questionRoutes)
 app.use('/api/ai', aiRoute)
 
 /** routes end here */

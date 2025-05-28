@@ -37,7 +37,7 @@ async function loginUser (req, res) {
     if (!user) {
       return res.status(401).json({ message: 'email or password envalid' })
     }
-    res.json({ message: 'user login successfully' })
+    res.json({ message: 'user login successfully', data: user })
   } catch (err) {
     res.status(500).json({ message: 'Login failed', error: err.message })
   }

@@ -69,6 +69,28 @@ exports.createSession = async (req, res) => {
 
 // get all the session for the logged in user
 // @route - get in api/sessions/my-sessions
+exports.getMySessions = async (req, res) => {
+  try {
+    const db = getDb()
+    // Get userId from req.user (if using auth middleware) or from query/body
+    const userId = req.user?._id || req.query.userId || req.body.userId
+    if (!userId) {
+      return res
+        .status(400)
+        .json({ success: false, message: 'userId required' })
+    }
+    // Find all sessions for this user
+    const sessions = await db
+      .collection('sessions')
+      .find({ user: userId })
+      .toArray()
+    res.json({ success: true, sessions })
+  } catch (err) {
+    res
+      .status(500)
+      .json({ success: false, message: 'Server Error', error: err.message })
+  }
+}
 
 // get a session by id
 // @route - get in api/sessions/:id
