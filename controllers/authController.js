@@ -77,4 +77,31 @@ async function loginUser(req, res) {
   }
 }
 
-module.exports = { registerUser, loginUser };
+// get user details
+async function profile(req, res) {
+  try {
+    const db = getDb();
+    const token = req.cookies.token;
+    if (!token) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const user = await db.collection("users").findOne({ email: decoded.email });
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.status(200).json({
+      massage: "User details fetched successfully",
+      data: user,
+    });
+  } catch (err) {
+    res
+      .status(500)
+      .json({ message: "Failed to fetch user details", error: err.message });
+  }
+}
+
+module.exports = { registerUser, loginUser, profile };
