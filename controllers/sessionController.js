@@ -1,16 +1,20 @@
 const { getDb } = require('../dtbase/db')
+const { verifyUserFromToken } = require('../utils/authJWT')
 
 // create a new session
 // @route - post in api/sessions/create
 
 exports.createSession = async (req, res) => {
+  const user = await verifyUserFromToken(req, res)
+  if (!user) return
+
   try {
     // Destructure all expected props from req.body
     const { role, experience, topicsToFocus, description, questions, ...rest } =
       req.body
 
     // If you have authentication, get userId from req.user, else from body
-    const userId = req.user?._id || req.body.userId
+    // const userId = req.user?._id || req.body.userId
 
     // if (!userId) {
     //   return res
@@ -18,9 +22,11 @@ exports.createSession = async (req, res) => {
     //     .json({ success: false, message: 'userId required' })
     // }
 
+    // console.log(user)
+
     // Build sessionData with all props
     const sessionData = {
-      user: req?.body?.userId,
+      user: user._id,
       role,
       experience,
       topicsToFocus,
@@ -70,20 +76,26 @@ exports.createSession = async (req, res) => {
 // get all the session for the logged in user
 // @route - get in api/sessions/my-sessions
 exports.getMySessions = async (req, res) => {
+  const user = await verifyUserFromToken(req, res)
+  if (!user) return
+
   try {
     const db = getDb()
     // Get userId from req.user (if using auth middleware) or from query/body
-    const userId = req.user?._id || req.query.userId || req.body.userId
-    if (!userId) {
-      return res
-        .status(400)
-        .json({ success: false, message: 'userId required' })
-    }
+    // const userId = req.user?._id || req.query.userId || req.body.userId
+
+    // if (!userId) {
+    //   return res
+    //     .status(400)
+    //     .json({ success: false, message: 'userId required' })
+    // }
+
     // Find all sessions for this user
     const sessions = await db
       .collection('sessions')
-      .find({ user: userId })
+      .find({ user: user._id })
       .toArray()
+
     res.json({ success: true, sessions })
   } catch (err) {
     res
@@ -95,6 +107,9 @@ exports.getMySessions = async (req, res) => {
 // get a session by id
 // @route - get in api/sessions/:id
 exports.getSessionById = async (req, res) => {
+  const user = await verifyUserFromToken(req, res)
+  if (!user) return
+
   try {
     const db = getDb()
     const sessionId = req.params.id
@@ -103,20 +118,24 @@ exports.getSessionById = async (req, res) => {
         .status(400)
         .json({ success: false, message: 'Session id required' })
     }
+
     const { ObjectId } = require('mongodb')
     const session = await db
       .collection('sessions')
       .findOne({ _id: new ObjectId(sessionId) })
+
     if (!session) {
       return res
         .status(404)
         .json({ success: false, message: 'Session not found' })
     }
+
     // Optionally, fetch questions for this session
     const questions = await db
       .collection('questions')
       .find({ session: new ObjectId(sessionId) })
       .toArray()
+
     res.json({ success: true, session, questions })
   } catch (err) {
     res
@@ -128,6 +147,9 @@ exports.getSessionById = async (req, res) => {
 // delete a session by id
 // @route - delete in api/sessions/:id
 exports.deleteSessionById = async (req, res) => {
+  const user = await verifyUserFromToken(req, res)
+  if (!user) return
+
   try {
     const db = getDb()
     const sessionId = req.params.id
@@ -136,6 +158,7 @@ exports.deleteSessionById = async (req, res) => {
         .status(400)
         .json({ success: false, message: 'Session id required' })
     }
+
     const { ObjectId } = require('mongodb')
 
     // Delete the session
@@ -152,6 +175,7 @@ exports.deleteSessionById = async (req, res) => {
         .status(404)
         .json({ success: false, message: 'Session not found' })
     }
+
     res.json({
       success: true,
       message: 'Session deleted successfully'

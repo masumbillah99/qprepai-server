@@ -12,7 +12,13 @@ const questionRoutes = require('./routes/questionRoutes')
 const aiRoute = require('./routes/aiRoute')
 
 // middleware
-app.use(cors())
+// Correct CORS usage for credentials
+app.use(
+  cors({
+    origin: 'http://localhost:5173', // frontend URL
+    credentials: true
+  })
+)
 app.use(express.json())
 
 // call mongodb
