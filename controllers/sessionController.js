@@ -69,6 +69,28 @@ exports.createSession = async (req, res) => {
 
 // get all the session for the logged in user
 // @route - get in api/sessions/my-sessions
+exports.getMySessions = async (req, res) => {
+  try {
+    const db = getDb()
+    // Get userId from req.user (if using auth middleware) or from query/body
+    const userId = req.user?._id || req.query.userId || req.body.userId
+    if (!userId) {
+      return res
+        .status(400)
+        .json({ success: false, message: 'userId required' })
+    }
+    // Find all sessions for this user
+    const sessions = await db
+      .collection('sessions')
+      .find({ user: userId })
+      .toArray()
+    res.json({ success: true, sessions })
+  } catch (err) {
+    res
+      .status(500)
+      .json({ success: false, message: 'Server Error', error: err.message })
+  }
+}
 
 // get a session by id
 // @route - get in api/sessions/:id
@@ -105,3 +127,38 @@ exports.getSessionById = async (req, res) => {
 
 // delete a session by id
 // @route - delete in api/sessions/:id
+exports.deleteSessionById = async (req, res) => {
+  try {
+    const db = getDb()
+    const sessionId = req.params.id
+    if (!sessionId) {
+      return res
+        .status(400)
+        .json({ success: false, message: 'Session id required' })
+    }
+    const { ObjectId } = require('mongodb')
+
+    // Delete the session
+    const sessionResult = await db
+      .collection('sessions')
+      .deleteOne({ _id: new ObjectId(sessionId) })
+
+    // Optionally, delete related questions
+    await db
+      .collection('questions')
+      .deleteMany({ session: new ObjectId(sessionId) })
+    if (sessionResult.deletedCount === 0) {
+      return res
+        .status(404)
+        .json({ success: false, message: 'Session not found' })
+    }
+    res.json({
+      success: true,
+      message: 'Session deleted successfully'
+    })
+  } catch (err) {
+    res
+      .status(500)
+      .json({ success: false, message: 'Server Error', error: err.message })
+  }
+}
