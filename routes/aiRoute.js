@@ -1,8 +1,5 @@
 const express = require('express')
-const {
-  generateInterviewQuestions,
-  generateConceptExplanation
-} = require('../controllers/aiController')
+const { generateInterviewQuestions, generateConceptExplanation } = require('../controllers/aiController')
 
 const router = express.Router()
 

@@ -3,10 +3,7 @@ const app = express()
 const cors = require('cors')
 const path = require('path')
 require('dotenv').config()
-const { MongoClient, ServerApiVersion } = require('mongodb')
 const { connectDB } = require('./dtbase/db')
-const cookieParser = require('cookie-parser')
-const morgan = require('morgan')
 const port = process.env.PORT || 5000
 
 const authRoutes = require('./routes/auth')
@@ -23,10 +20,9 @@ app.use(
   })
 )
 app.use(express.json())
-app.use(cookieParser())
-app.use(morgan('dev'))
 
 // call mongodb
+connectDB()
 
 /** routes start here */
 
@@ -42,7 +38,6 @@ app.get('/', (req, res) => {
   res.send('Server is idle. Do the work')
 })
 
-app.listen(port, async () => {
+app.listen(port, () => {
   console.log(`Server is running on port - ${port}`)
-  await connectDB()
 })
