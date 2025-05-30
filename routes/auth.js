@@ -9,8 +9,10 @@ const {
 
 // Register new user
 router.post('/register', registerUser)
+router.post('/register', registerUser)
 
 // Login user
+router.post('/login', loginUser)
 router.post('/login', loginUser)
 
 // get user profile
