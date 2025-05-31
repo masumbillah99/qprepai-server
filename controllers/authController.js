@@ -69,7 +69,9 @@ async function loginUser (req, res) {
       })
     }
 
-    res.json({ message: 'user login successfully' })
+    // console.log('from 72', user)
+
+    res.json({ message: 'user login successfully', data: user })
   } catch (err) {
     res.status(500).json({ message: 'Login failed', error: err.message })
   }
@@ -87,12 +89,16 @@ async function profile (req, res) {
     const decoded = jwt.verify(token, process.env.JWT_SECRET)
     const user = await db.collection('users').findOne({ email: decoded.email })
 
+    console.log('Cookies received:', req.cookies)
+
     if (!user) {
       return res.status(404).json({ message: 'User not found' })
     }
 
+    console.log(user)
+
     res.status(200).json({
-      massage: 'User details fetched successfully',
+      message: 'User details fetched successfully',
       data: user
     })
   } catch (err) {
