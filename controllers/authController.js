@@ -87,15 +87,11 @@ const profile = async (req, res) => {
     const decoded = jwt.verify(token, process.env.JWT_SECRET)
     const user = await db.collection('users').findOne({ email: decoded.email })
 
-    console.log('Cookies received:', req.cookies)
-    const decoded = jwt.verify(token, process.env.JWT_SECRET)
-    const user = await db.collection('users').findOne({ email: decoded.email })
-
     if (!user) {
       return res.status(404).json({ message: 'User not found' })
     }
 
-    console.log(user)
+    // console.log(user)
 
     res.status(200).json({
       massage: 'User details fetched successfully',

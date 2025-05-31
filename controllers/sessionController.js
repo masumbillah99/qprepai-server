@@ -53,9 +53,12 @@ exports.createSession = async (req, res) => {
       )
 
       // Update session with question ids
-      await db
+      const updateRes = await db
         .collection('sessions')
         .updateOne({ _id: sessionId }, { $set: { questions: questionDocs } })
+
+      // console.log('questions inserted', questionDocs)
+      // console.log('updateres', updateRes)
     }
 
     // Fetch the full session document to return
@@ -96,7 +99,7 @@ exports.getMySessions = async (req, res) => {
       .find({ user: user._id })
       .toArray()
 
-    res.json({ success: true, sessions })
+    res.json(sessions)
   } catch (err) {
     res
       .status(500)
