@@ -1,22 +1,22 @@
 const express = require('express')
-const router = express.Router()
+const authRouter = express.Router()
 const {
   registerUser,
   loginUser,
-  profile,
-  logoutUser
+  logoutUser,
+  profile
 } = require('../controllers/authController')
 
 // Register new user
-router.post('/register', registerUser)
+authRouter.post('/register', registerUser)
 
 // Login user
-router.post('/login', loginUser)
+authRouter.post('/login', loginUser)
 
 // get user profile
-router.get('/profile', profile)
+authRouter.get('/profile', profile)
 
 // logout user
-router.post('/logout', logoutUser)
+authRouter.post('/logout', logoutUser)
 
-module.exports = router
+module.exports = authRouter
