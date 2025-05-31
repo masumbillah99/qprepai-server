@@ -1,43 +1,49 @@
-const express = require('express')
-const app = express()
-const cors = require('cors')
-const path = require('path')
-require('dotenv').config()
-const { connectDB } = require('./dtbase/db')
-const port = process.env.PORT || 5000
+require("dotenv").config();
+const express = require("express");
+const app = express();
+const cors = require("cors");
+const morgan = require("morgan");
+const cookieParser = require("cookie-parser");
+const { connectDB } = require("./dtbase/db");
 
-const authRoutes = require('./routes/auth')
-const sessionRoutes = require('./routes/sessionRoutes')
-const questionRoutes = require('./routes/questionRoutes')
-const aiRoute = require('./routes/aiRoute')
+const authRouter = require("./routes/auth");
+const sessionRoutes = require("./routes/sessionRoutes");
+const questionRoutes = require("./routes/questionRoutes");
+const aiRoute = require("./routes/aiRoute");
 
-// middleware
-// Correct CORS usage for credentials
+const port = process.env.PORT || 5000;
+
+// Middleware
 app.use(
   cors({
-    origin: 'http://localhost:5173', // frontend URL
-    credentials: true
+    origin: "http://localhost:5173",
+    credentials: true,
   })
-)
-app.use(express.json())
+);
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(morgan("dev"));
+app.use(cookieParser());
 
-// call mongodb
-connectDB()
+// Routes
+app.use("/api/auth", authRouter);
+app.use("/api/sessions", sessionRoutes);
+app.use("/api/questions", questionRoutes);
+app.use("/api/ai", aiRoute);
 
-/** routes start here */
+// Root route
+app.get("/", (req, res) => {
+  res.send("Server is idle. Do the work");
+});
 
-app.use('/api/auth', authRoutes)
-app.use('/api/sessions', sessionRoutes)
-app.use('/api/questions', questionRoutes)
-app.use('/api/ai', aiRoute)
+// Error handling middleware (optional)
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).json({ message: "Internal Server Error" });
+});
 
-/** routes end here */
-
-// server start
-app.get('/', (req, res) => {
-  res.send('Server is idle. Do the work')
-})
-
-app.listen(port, () => {
-  console.log(`Server is running on port - ${port}`)
-})
+// Start server
+app.listen(port, async () => {
+  console.log(`Server is running at http://localhost:${port}`);
+  await connectDB();
+});
