@@ -17,7 +17,7 @@ const {
 const generateInterviewQuestions = async (req, res) => {
   try {
     const { role, experience, topicsToFocus, numberOfQuestions } = req.body
-    if (!role || !experience || !topicsToFocus || !numberOfQuestions) {
+    if (!role || !experience || !topicsToFocus) {
       return res.status(400).json({ message: 'Missing required fields' })
     }
     const prompt = questionAnswerPrompt(
