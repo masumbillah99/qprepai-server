@@ -16,7 +16,7 @@ const port = process.env.PORT || 5000
 // Middleware
 app.use(
   cors({
-    origin: 'https://qprepai.vercel.app/',
+    origin: 'https://qprepai.vercel.app',
     credentials: true
   })
 )
