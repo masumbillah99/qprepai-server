@@ -36,7 +36,7 @@ app.get('/', (req, res) => {
   res.send('Server is idle. Do the work')
 })
 
-// Error handling middleware (optional)
+// Error handling middleware
 app.use((err, req, res, next) => {
   console.error(err.stack)
   res.status(500).json({ message: 'Internal Server Error' })
